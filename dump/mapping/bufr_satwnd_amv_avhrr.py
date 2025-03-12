@@ -5,51 +5,63 @@ import numpy as np
 
 import bufr
 from bufr.obs_builder import add_main_functions
+from bufr_satwnd_amv_obs_builder import SatWndAmvObsBuilder, map_path
 
-from bufr_satwnd_amv_obs_builder import SatWndAmvObsBuilder
 
+MAPPING_PATH = map_path(__file__, 'bufr_satwnd_amv_avhrr_mapping.yaml')
 
 class SatWndAmvAvhrrObsBuilder(SatWndAmvObsBuilder):
-    def __init__(self, input_path, mapping_path):
-        super().__init__(input_path, mapping_path, log_name=os.path.basename(__file__))
+    def __init__(self):
+        super().__init__(MAPPING_PATH, log_name=os.path.basename(__file__))
 
     # Override implementations for methods from the ObsBuilder class
-    def _make_description(self):
-        description = bufr.encoders.Description(self.mapping_path)
-
-        self._add_wind_descriptions(description)
+    def make_description(self):
+        description = super().make_description()
         self._add_quality_info_and_gen_app_descriptions(description)
 
         return description
 
-    def _make_obs(self, comm):
-        # Get container from mapping file first
-        self.log.info('Get container from bufr')
-        container = bufr.Parser(self.input_path, self.mapping_path).parse(comm)
 
-        self.log.debug(f'container list (original): {container.list()}')
-        self.log.debug(f'all_sub_categories =  {container.all_sub_categories()}')
-        self.log.debug(f'category map =  {container.get_category_map()}')
+    def make_obs(self, comm, input_path):
+        # Get container from mapping file first
+        container = super().make_obs(comm, input_path)
 
         # Add new/derived data into container
         for cat in container.all_sub_categories():
-            self.log.debug(f'category = {cat}')
-
-            satId = container.get('satelliteId', cat)
-            if not satId:
-                self.log.warning(f'category {cat[0]} does not exist in input file')
-
-            self._add_wind_obs(container, cat)
-            self._add_gen_info_and_quality_info(container, cat)
-
-        # Check
-        self.log.debug(f'container list (updated): {container.list()}')
-        self.log.debug('all_sub_categories {container.all_sub_categories()}')
+            self._add_avhrr_quality_info_and_gen_app(container, cat)
 
         return container
 
-    # Override methods from SatWndAmvObsBuilder
-    def _get_quality_info_and_gen_app(self, gnap2D, pccf2D, satID):
+
+    def _get_obs_type(self, swcm, chan_freq):
+        obstype = swcm.copy()
+
+        # Use numpy vectorized operations
+        obstype = np.where(swcm == 1, 244, obstype)  # IRLW
+
+        if not np.any(np.isin(obstype, [244])):
+            raise ValueError("Error: Unassigned ObsType found ... ")
+
+        return obstype.astype(np.int32)
+
+
+    def _add_avhrr_quality_info_and_gen_app(self, container, cat):
+        # Add new variables: MetaData/windGeneratingApplication and qualityInformationWithoutForecast
+        gnap2D = container.get('generatingApplication', cat)
+        pccf2D = container.get('qualityInformation', cat)
+        satId = container.get('satelliteId', cat)
+
+        gnap, qifn = self._get_avhrr_quality_info_and_gen_app(gnap2D, pccf2D, satId)
+
+        self.log.debug(f'gnap min/max = {gnap.min()} {gnap.max()}')
+        self.log.debug(f'qifn min/max = {qifn.min()} {qifn.max()}')
+
+        paths = container.get_paths('windComputationMethod', cat)
+        container.add('windGeneratingApplication', gnap, paths, cat)
+        container.add('qualityInformationWithoutForecast', qifn, paths, cat)
+
+
+    def _get_avhrr_quality_info_and_gen_app(self, gnap2D, pccf2D, satID):
         # For METOP-A/B/C AVHRR data (satID 3,4,5), qi w/o forecast (qifn) is
         # packaged in same vector of qi with ga = 5 (QI without forecast), and EE
         # is packaged in same vector of qi with ga=7 (Estimated Error (EE) in m/s
@@ -110,30 +122,6 @@ class SatWndAmvAvhrrObsBuilder(SatWndAmvObsBuilder):
         # NOTE: Make sure to return np.float32 or np.int32 types as appropriate!!!
         return gnap.astype(np.int32), qifn.astype(np.int32)
 
-    def _get_obs_type(self, swcm):
-        """
-        Determine the observation type based on `swcm` and `chanfreq`.
-
-        Parameters:
-            swcm (array-like): Switch mode values.
-            chanfreq (array-like): Channel frequency values (Hz).
-
-        Returns:
-            numpy.ndarray: Observation type array.
-
-        Raises:
-            ValueError: If any `obstype` is unassigned.
-        """
-
-        obstype = swcm.copy()
-
-        # Use numpy vectorized operations
-        obstype = np.where(swcm == 1, 244, obstype)  # IRLW
-
-        if not np.any(np.isin(obstype, [244])):
-            raise ValueError("Error: Unassigned ObsType found ... ")
-
-        return obstype.astype(np.int32)
 
 # Add main functions create_obs_file and create_obs_group
-add_main_functions(SatWndAmvAvhrrObsBuilder)
+add_main_functions(SatWndAmvAvhrrObsBuilder, use_categories=True, use_cache=True)

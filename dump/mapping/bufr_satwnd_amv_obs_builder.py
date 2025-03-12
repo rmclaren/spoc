@@ -7,20 +7,25 @@ import bufr
 from bufr.obs_builder import ObsBuilder
 
 
+def map_path(source_path, map_file_name):
+    script_dir = os.path.dirname(os.path.abspath(source_path))
+    return os.path.join(script_dir, map_file_name)
+
 class SatWndAmvObsBuilder(ObsBuilder):
-    def __init__(self, input_path, mapping_path, log_name=os.path.basename(__file__)):
-        super().__init__(input_path, mapping_path, log_name=log_name)
+    def __init__(self, mapping_path, log_name=os.path.basename(__file__)):
+        super().__init__(mapping_path, log_name=log_name)
 
     # Provide defualt implementations for methods from the ObsBuilder class
-    def _make_description(self):
-        description = bufr.encoders.Description(self.mapping_path)
-        self.add_wind_descriptions(description)
+    def make_description(self):
+        description = super().make_description()
+        self._add_wind_descriptions(description)
+
         return description
 
-    def _make_obs(self, comm):
+    def make_obs(self, comm, input_path):
         # Get container from mapping file first
         self.log.info('Get container from bufr')
-        container = bufr.Parser(self.input_path, self.mapping_path).parse(comm)
+        container = super().make_obs(comm, input_path)
 
         self.log.debug(f'container list (original): {container.list()}')
         self.log.debug(f'all_sub_categories =  {container.all_sub_categories()}')
@@ -96,7 +101,7 @@ class SatWndAmvObsBuilder(ObsBuilder):
         self.log.debug(f'swcm min/max = {swcm.min()} {swcm.max()}')
         self.log.debug('chanfreq min/max = {chanfreq.min()} {chanfreq.max()}')
 
-        obstype = self._get_obs_type(swcm)
+        obstype = self._get_obs_type(swcm, chanfreq)
 
         self.log.debug(f'obstype = {obstype}')
         self.log.debug(f'obstype min/max =  {obstype.min()} {obstype.max()}')
@@ -121,13 +126,13 @@ class SatWndAmvObsBuilder(ObsBuilder):
         container.add('windEastward', uob, paths, cat)
         container.add('windNorthward', vob, paths, cat)
 
-    def _add_quality_info_and_gen_app(self, container, cat):
+    def _add_quality_info_and_gen_app(self, findQi, container, cat):
         # Add new variables: MetaData/windGeneratingApplication and qualityInformationWithoutForecast
         gnap2D = container.get('generatingApplication', cat)
         pccf2D = container.get('qualityInformation', cat)
         satId = container.get('satelliteId', cat)
 
-        gnap, qifn = self._get_quality_info_and_gen_app(gnap2D, pccf2D, satId)
+        gnap, qifn = self._get_quality_info_and_gen_app(findQi, gnap2D, pccf2D, satId)
 
         self.log.debug(f'gnap min/max = {gnap.min()} {gnap.max()}')
         self.log.debug(f'qifn min/max = {qifn.min()} {qifn.max()}')
@@ -136,6 +141,22 @@ class SatWndAmvObsBuilder(ObsBuilder):
         container.add('windGeneratingApplication', gnap, paths, cat)
         container.add('qualityInformationWithoutForecast', qifn, paths, cat)
 
+    def _get_obs_type(self, swcm, chan_freq=0):
+        """
+        Determine the observation type based on `swcm` and `chanfreq`.
+
+        Parameters:
+            swcm (array-like): Switch mode values.
+            chanfreq (array-like): Channel frequency values (Hz).
+
+        Returns:
+            numpy.ndarray: Observation type array.
+
+        Raises:
+            ValueError: If any `obstype` is unassigned.
+        """
+
+        raise NotImplementedError('Method _get_obs_type must be implemented in derived classes')
 
     # Private methods
     def _compute_wind_components(self, wdir, wspd):
@@ -155,9 +176,34 @@ class SatWndAmvObsBuilder(ObsBuilder):
 
         return u.astype(np.float32), v.astype(np.float32)
 
+    def _get_quality_info_and_gen_app(self, findQi, gnap2D, pccf2D):
+        # For NOAA VIIRS data, qi w/o forecast (qifn) is packaged in same
+        # vector of qi with ga = 5 (EUMETSAT QI without forecast). Must
+        # conduct a search and extract the correct vector for gnap and qi
 
-    def _get_obs_type(self, swcm):
-        raise NotImplementedError("Method '_get_obs_type' must be implemented in a subclass")
+        # 1. Find dimension-sizes of ga and qi (should be the same!)
+        gDim1, gDim2 = np.shape(gnap2D)
+        qDim1, qDim2 = np.shape(pccf2D)
+        self.log.info('Generating Application and Quality Information SEARCH')
+        self.log.debug( f'Dimension size of GNAP ({gDim1},{gDim2})')
+        self.log.debug( f'Dimension size of PCCF ({qDim1},{qDim2})')
 
-    def _get_quality_info_and_gen_app(self, gnap2D, pccf2D, satId):
-        raise NotImplementedError("Method '_get_quality_info_and_gen_app' must be implemented in a subclass")
+        # 2. Initialize gnap and qifn as None, and search for dimension of
+        #    ga with values of 5. If the same column exists for qi, assign
+        #    gnap to ga[:,i] and qifn to qi[:,i], else raise warning that no
+        #    appropriate GNAP/PCCF combination was found
+        gnap = None
+        qifn = None
+        for i in range(gDim2):
+            if np.unique(gnap2D[:, i].squeeze()) == find_qi:
+                if i <= qDim2:
+                    self.log.info(f'GNAP/PCCF found for column {i}')
+                    gnap = gnap2D[:, i].squeeze()
+                    qifn = pccf2D[:, i].squeeze()
+                else:
+                    self.log.info(f'ERROR: GNAP column {i} outside of PCCF dimension {qDim2}')
+        if (gnap is None) & (qifn is None):
+            raise ValueError(f'GNAP == {findQI} NOT FOUND OR OUT OF PCCF DIMENSION-RANGE, WILL FAIL!')
+        # If EE is needed, key search on np.unique(gnap2D[:,i].squeeze()) == 7 instead
+        # NOTE: Make sure to return np.float32 or np.int32 types as appropriate!!!
+        return gnap.astype(np.int32), qifn.astype(np.int32)

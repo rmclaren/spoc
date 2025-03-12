@@ -5,31 +5,17 @@ import numpy as np
 
 import bufr
 from bufr.obs_builder import add_main_functions
+from bufr_satwnd_amv_obs_builder import SatWndAmvObsBuilder, map_path
 
-from bufr_satwnd_amv_obs_builder import SatWndAmvObsBuilder
 
+MAPPING_PATH = map_path(__file__, 'bufr_satwnd_amv_abi_mapping.yaml')
 
 class SatWndAmvAbiObsBuilder(SatWndAmvObsBuilder):
-    def __init__(self, input_path, mapping_path):
-        super().__init__(input_path, mapping_path, log_name=os.path.basename(__file__))
+    def __init__(self):
+        super().__init__(MAPPING_PATH, log_name=os.path.basename(__file__))
 
-    # Use the SatWndAmvObsBuilder implementations for the methods make_description and make_obs
 
     def _get_obs_type(self, swcm, chanfreq):
-        """
-        Determine the observation type based on `swcm` and `chanfreq`.
-
-        Parameters:
-            swcm (array-like): Satellite derived wind calculation method.
-            chanfreq (array-like): Satellite channel center frequency (Hz).
-
-        Returns:
-            numpy.ndarray: Observation type array.
-
-        Raises:
-            ValueError: If any `obstype` is unassigned.
-        """
-
         obstype = swcm.copy()
 
         # Use numpy vectorized operations
@@ -48,4 +34,4 @@ class SatWndAmvAbiObsBuilder(SatWndAmvObsBuilder):
 
 
 # Add main functions create_obs_file and create_obs_group
-add_main_functions(SatWndAmvAbiObsBuilder)
+add_main_functions(SatWndAmvAbiObsBuilder, use_categories=True, use_cache=True)
