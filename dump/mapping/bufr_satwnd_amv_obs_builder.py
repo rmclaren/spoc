@@ -7,8 +7,8 @@ import bufr
 from bufr.obs_builder import ObsBuilder
 
 
-def map_path(source_path, map_file_name):
-    script_dir = os.path.dirname(os.path.abspath(source_path))
+def map_path(map_file_name):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(script_dir, map_file_name)
 
 class SatWndAmvObsBuilder(ObsBuilder):
