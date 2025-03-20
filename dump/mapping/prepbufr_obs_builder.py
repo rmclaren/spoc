@@ -24,12 +24,15 @@ class PrepbufrObsBuilder(ObsBuilder):
 
         # raise error if pattern not found
         if not m.groups():
-            raise Exception("Error: Path string did not match the expected pattern.")
+            self.log.warning(f'Input file path {input_path} does not contain date information, using the default')
+            ref_time = datetime(year=1970, month=1, day=1)
+        else:
+            ref_time = datetime(year=int(m.group('year')),
+                                month=int(m.group('month')),
+                                day=int(m.group('day')),
+                                hour=int(path_components[-3]))
 
-        return np.datetime64(datetime(year=int(m.group('year')),
-                                      month=int(m.group('month')),
-                                      day=int(m.group('day')),
-                                      hour=int(path_components[-3])))
+        return np.datetime64(ref_time)
 
     def _add_timestamp(self, container: bufr.DataContainer, reference_time: np.datetime64) -> np.array:
         cycle_times = np.array([3600 * t for t in container.get('obsTimeMinusCycleTime')]).astype('timedelta64[s]')
