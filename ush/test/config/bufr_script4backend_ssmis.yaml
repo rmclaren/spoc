@@ -10,7 +10,7 @@ observations:
     obsdatain:
       engine:
         type: bufr 
-        obsfile: "./testinput/2021080100/gdas.t00z.ssmis.tm00.bufr_d"
+        obsfile: "./testinput/2021080100/gdas.t00z.ssmisu.tm00.bufr_d"
         mapping file: "./bufr_ssmis_mapping.yaml"
         category: ["f16"]            # optional (needed if the BUFR mapping defines splits)
         cache categories:            # optional
@@ -28,7 +28,7 @@ observations:
     obsdatain:
       engine:
         type: bufr 
-        obsfile: "./testinput/2021080100/gdas.t00z.ssmis.tm00.bufr_d"
+        obsfile: "./testinput/2021080100/gdas.t00z.ssmisu.tm00.bufr_d"
         mapping file: "./bufr_ssmis_mapping.yaml"
         category: ["f17"]            # optional (needed if the BUFR mapping defines splits)
         cache categories:            # optional
@@ -46,7 +46,7 @@ observations:
     obsdatain:
       engine:
         type: bufr 
-        obsfile: "./testinput/2021080100/gdas.t00z.ssmis.tm00.bufr_d"
+        obsfile: "./testinput/2021080100/gdas.t00z.ssmisu.tm00.bufr_d"
         mapping file: "./bufr_ssmis_mapping.yaml"
         category: ["f18"]
         cache categories:
