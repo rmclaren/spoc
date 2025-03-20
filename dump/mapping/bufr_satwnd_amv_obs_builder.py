@@ -15,13 +15,6 @@ class SatWndAmvObsBuilder(ObsBuilder):
     def __init__(self, mapping_path, log_name=os.path.basename(__file__)):
         super().__init__(mapping_path, log_name=log_name)
 
-    # Provide defualt implementations for methods from the ObsBuilder class
-    def make_description(self):
-        description = super().make_description()
-        self._add_wind_descriptions(description)
-
-        return description
-
     def make_obs(self, comm, input_path):
         # Get container from mapping file first
         self.log.info('Get container from bufr')
@@ -36,10 +29,10 @@ class SatWndAmvObsBuilder(ObsBuilder):
             self.log.debug(f'category = {cat}')
 
             satId = container.get('satelliteId', cat)
-            if not satId:
+            if not np.any(satId):
                 self.log.warning(f'category {cat[0]} does not exist in input file')
 
-            self.add_wind_obs(container, cat)
+            self._add_wind_obs(container, cat)
 
         # Check
         self.log.debug(f'container list (updated): {container.list()}')
@@ -47,6 +40,12 @@ class SatWndAmvObsBuilder(ObsBuilder):
 
         return container
 
+    # Provide defualt implementations for methods from the ObsBuilder class
+    def _make_description(self):
+        description = super()._make_description()
+        self._add_wind_descriptions(description)
+
+        return description
 
     # Methods that are used to extend the export description
     def _add_wind_descriptions(self, description):
@@ -85,7 +84,7 @@ class SatWndAmvObsBuilder(ObsBuilder):
                 'longName': 'Wind Generating Application',
             },
             {
-                'name': 'qualityInformationWithoutForecast',
+                'name': 'MetaData/qualityInformationWithoutForecast',
                 'source': 'qualityInformationWithoutForecast',
                 'units': '1',
                 'longName': 'Quality Information Without Forecast',
@@ -98,7 +97,20 @@ class SatWndAmvObsBuilder(ObsBuilder):
         swcm = container.get('windComputationMethod', cat)
         chanfreq = container.get('sensorCentralFrequency', cat)
 
-        self.log.debug(f'swcm min/max = {swcm.min()} {swcm.max()}')
+        if swcm.size == 0:
+            self.log.warning(f'category {cat[0]} does not exist in input file')
+            paths = container.get_paths('variables/windComputationMethod', cat)
+            obstype = container.get('variables/windComputationMethod', cat)
+            container.add('variables/obstype_uwind', obstype, paths, cat)
+            container.add('variables/obstype_vwind', obstype, paths, cat)
+
+            paths = container.get_paths('variables/windSpeed', cat)
+            wob = container.get('variables/windSpeed', cat)
+            container.add('variables/windEastward', wob, paths, cat)
+            container.add('variables/windNorthward', wob, paths, cat)
+            return
+
+        # self.log.debug(f'swcm min/max = {swcm.min()} {swcm.max()}')
         self.log.debug('chanfreq min/max = {chanfreq.min()} {chanfreq.max()}')
 
         obstype = self._get_obs_type(swcm, chanfreq)
@@ -131,6 +143,13 @@ class SatWndAmvObsBuilder(ObsBuilder):
         gnap2D = container.get('generatingApplication', cat)
         pccf2D = container.get('qualityInformation', cat)
         satId = container.get('satelliteId', cat)
+
+        if not satId.size:
+            paths = container.get_paths('windComputationMethod', cat)
+            dummy = container.get('windSpeed', cat)
+            container.add('windGeneratingApplication', dummy, paths, cat)
+            container.add('qualityInformationWithoutForecast', dummy, paths, cat)
+            return
 
         gnap, qifn = self._get_quality_info_and_gen_app(findQi, gnap2D, pccf2D, satId)
 

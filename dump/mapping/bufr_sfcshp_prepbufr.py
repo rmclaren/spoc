@@ -14,8 +14,8 @@ class SfcshpPrepbufrObsBuilder(PrepbufrObsBuilder):
     def __init__(self):
         super().__init__(MAPPING_PATH, log_name=os.path.basename(__file__))
 
-    def make_description(self):
-        description = super.make_description()
+    def _make_description(self):
+        description = super._make_description()
 
         description.add_variables([
             {

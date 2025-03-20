@@ -34,4 +34,4 @@ class SatWndAmvAbiObsBuilder(SatWndAmvObsBuilder):
 
 
 # Add main functions create_obs_file and create_obs_group
-add_main_functions(SatWndAmvAbiObsBuilder, use_categories=True, use_cache=True)
+add_main_functions(SatWndAmvAbiObsBuilder, uses_categories=True)

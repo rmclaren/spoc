@@ -15,11 +15,6 @@ class SatWndAmvAhiObsBuilder(SatWndAmvObsBuilder):
     def __init__(self):
         super().__init__(MAPPING_PATH, log_name=os.path.basename(__file__))
 
-    def make_description(self):
-        description = super().make_description()
-        self._add_quality_info_and_gen_app_descriptions(description)
-
-        return description
 
     def make_obs(self, comm, input_path):
         # Get container from mapping file first
@@ -30,6 +25,14 @@ class SatWndAmvAhiObsBuilder(SatWndAmvObsBuilder):
             self._add_quality_info_and_gen_app_obs(FIND_QI, container, cat)
 
         return container
+
+
+    def _make_description(self):
+        description = super()._make_description()
+        self._add_quality_info_and_gen_app_descriptions(description)
+
+        return description
+
 
     def _get_obs_type(self, swcm, chan_freq):
         obstype = swcm.copy()
@@ -46,4 +49,4 @@ class SatWndAmvAhiObsBuilder(SatWndAmvObsBuilder):
         return obstype
 
 
-add_main_functions(SatWndAmvAhiObsBuilder, use_categories=True, use_cache=True)
+add_main_functions(SatWndAmvAhiObsBuilder, uses_categories=True, use_cache=True)

@@ -13,12 +13,6 @@ bufr:
       query: "*/TYP"
 
     # MetaData
-    timestamp:
-      timeoffset:
-        timeOffset: "*/DHR"
-        transforms:
-          - scale: 3600
-        referenceTime: "2021-08-01T00:00:00Z"
     prepbufrDataLevelCategory:
       query: "*/CAT"
     obsTimeMinusCycleTime:
