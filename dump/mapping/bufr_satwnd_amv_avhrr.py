@@ -8,7 +8,7 @@ from bufr.obs_builder import add_main_functions
 from bufr_satwnd_amv_obs_builder import SatWndAmvObsBuilder, map_path
 
 
-MAPPING_PATH = map_path('bufr_satwnd_amv_avhrr_mapping.yaml')
+MAPPING_PATH = map_path('bufr_satwnd_amv_avhrr.yaml')
 
 class SatWndAmvAvhrrObsBuilder(SatWndAmvObsBuilder):
     def __init__(self):

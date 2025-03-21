@@ -9,7 +9,7 @@ from bufr.obs_builder import add_main_functions
 from prepbufr_obs_builder import PrepbufrObsBuilder, map_path
 
 
-MAPPING_PATH = map_path('bufr_sfcshp_prepbufr_mapping.yaml')
+MAPPING_PATH = map_path('bufr_sfcshp_prepbufr.yaml')
 
 class SfcshpPrepbufrObsBuilder(PrepbufrObsBuilder):
     def __init__(self):
