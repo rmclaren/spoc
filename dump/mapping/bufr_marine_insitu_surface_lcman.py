@@ -5,10 +5,10 @@ import bufr
 from bufr.obs_builder import add_main_functions
 from bufr_marine_insitu_obs_builder import MarineInsituObsBuilder, map_path
 
-MAPPING_PATH = map_path('bufr_marine_insitu_profile_bathy.yaml')
+MAPPING_PATH = map_path('bufr_marine_insitu_surface_lcman.yaml')
 
 
-class MarineInsituProfileBathyObsBuilder(MarineInsituObsBuilder):
+class MarineInsituSurfaceLcmanObsBuilder(MarineInsituObsBuilder):
     def __init__(self, config=None):
         super().__init__(MAPPING_PATH, config=config, log_name=os.path.basename(__file__))
 
@@ -16,13 +16,14 @@ class MarineInsituProfileBathyObsBuilder(MarineInsituObsBuilder):
         # Get container from mapping file first
         container = super().make_obs(comm, input_path)
 
-        temp = container.get("waterTemperature")
-        container.apply_mask((temp > -10.0) & (temp < 50.0))
+        temp = container.get("seaSurfaceTemperature")
+        temp_mask = (temp > -10.0) & (temp < 50.0)
 
-        self._add_preqc_var(container, "waterTemperature")
-        self._add_error_var(container, "waterTemperature", error=0.24)
-        self._add_seq_num(container)
+        container.apply_mask(temp_mask)
+
+        self._add_preqc_var(container, "seaSurfaceTemperature")
+        self._add_error_var(container, "seaSurfaceTemperature", error=0.24)
 
         return container
 
-add_main_functions(MarineInsituProfileBathyObsBuilder)
+add_main_functions(MarineInsituSurfaceLcmanObsBuilder)
