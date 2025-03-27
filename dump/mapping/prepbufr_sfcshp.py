@@ -47,10 +47,6 @@ class SfcshpPrepbufrObsBuilder(PrepbufrObsBuilder):
                 The communicator object (e.g., MPI)
         input_path: str
                 The input bufr file
-        mapping_path: str
-                The input bufr2ioda mapping file
-        cycle_time: str
-                The cycle in YYYYMMDDHH format
         """
 
         # Get container from mapping file first
@@ -58,12 +54,6 @@ class SfcshpPrepbufrObsBuilder(PrepbufrObsBuilder):
         container = self.super().make_obs(comm, input_path)
 
         self.log.debug(f'container list (original): {container.list()}')
-        self.log.debug(f'Change longitude range from [0,360] to [-180,180]')
-        lon = container.get('longitude')
-        lon_paths = container.get_paths('longitude')
-        lon[lon > 180] -= 360
-        lon = ma.round(lon, decimals=2)
-        self.log.debug(f'longitude new max/min: ${lon.max()}, ${lon.min()}')
 
         self.log.debug(f'Do DateTime calculation')
         self._add_timestamp(container, self._get_reference_time(input_path))
@@ -100,7 +90,6 @@ class SfcshpPrepbufrObsBuilder(PrepbufrObsBuilder):
         tvooe = np.where((tpc == 8), toboe, tvooe)
 
         self.log.debug(f'Update variables in container')
-        container.replace('longitude', lon)
         container.replace('airTemperatureObsValue', tsen)
         container.replace('airTemperatureQualityMarker', tsenqm)
         container.replace('airTemperatureObsError', tsenoe)
@@ -137,33 +126,5 @@ class SfcshpPrepbufrObsBuilder(PrepbufrObsBuilder):
                     sequenceNumber[i] = 1
 
         return sequenceNumber
-
-
-    def _compute_datetime(self, cycleTimeSinceEpoch, dhr):
-        """
-        Compute dateTime using the cycleTimeSinceEpoch and Cycle Time
-            minus Cycle Time
-
-        Parameters:
-            cycleTimeSinceEpoch: Time of cycle in Epoch Time
-            dhr: Observation Time Minus Cycle Time
-
-        Returns:
-            Masked array of dateTime values
-        """
-
-        int64_fill_value = np.int64(0)
-
-        dateTime = np.zeros(dhr.shape, dtype=np.int64)
-        for i in range(len(dateTime)):
-            if ma.is_masked(dhr[i]):
-                continue
-            else:
-                dateTime[i] = np.int64(dhr[i]*3600) + cycleTimeSinceEpoch
-
-        dateTime = ma.array(dateTime)
-        dateTime = ma.masked_values(dateTime, int64_fill_value)
-
-        return dateTime
 
 add_main_functions(SfcshpPrepbufrObsBuilder)

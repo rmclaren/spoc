@@ -34,6 +34,33 @@ class PrepbufrObsBuilder(ObsBuilder):
 
         return np.datetime64(ref_time)
 
+    def _compute_datetime(self, cycleTimeSinceEpoch, dhr):
+        """
+        Compute dateTime using the cycleTimeSinceEpoch and Cycle Time
+            minus Cycle Time
+
+        Parameters:
+            cycleTimeSinceEpoch: Time of cycle in Epoch Time
+            dhr: Observation Time Minus Cycle Time
+
+        Returns:
+            Masked array of dateTime values
+        """
+
+        int64_fill_value = np.int64(0)
+
+        dateTime = np.zeros(dhr.shape, dtype=np.int64)
+        for i in range(len(dateTime)):
+            if ma.is_masked(dhr[i]):
+                continue
+            else:
+                dateTime[i] = np.int64(dhr[i]*3600) + cycleTimeSinceEpoch
+
+        dateTime = ma.array(dateTime)
+        dateTime = ma.masked_values(dateTime, int64_fill_value)
+
+        return dateTime
+
     def _add_timestamp(self, container: bufr.DataContainer, reference_time: np.datetime64) -> np.array:
         cycle_times = np.array([3600 * t for t in container.get('obsTimeMinusCycleTime')]).astype('timedelta64[s]')
         time = (reference_time + cycle_times).astype('datetime64[s]').astype('int64')
