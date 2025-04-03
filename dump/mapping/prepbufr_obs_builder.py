@@ -28,6 +28,9 @@ class PrepbufrObsBuilder(ObsBuilder):
             dump_match = re.match(dump_regex, component)
             test_match = re.match(test_regex, component)
             if dump_match:
+                if idx == len(path_components) - 1:
+                    continue
+
                 ref_time = datetime(year=int(dump_match.group('year')),
                                     month=int(dump_match.group('month')),
                                     day=int(dump_match.group('day')),
