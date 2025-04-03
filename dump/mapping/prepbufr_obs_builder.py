@@ -27,10 +27,11 @@ class PrepbufrObsBuilder(ObsBuilder):
         for idx, component in enumerate(reversed(path_components)):
             dump_match = re.match(dump_regex, component)
             test_match = re.match(test_regex, component)
-            if dump_match:
-                if idx == len(path_components) - 1:
-                    continue
 
+            if idx == 0:
+                continue
+
+            if dump_match:
                 ref_time = datetime(year=int(dump_match.group('year')),
                                     month=int(dump_match.group('month')),
                                     day=int(dump_match.group('day')),
