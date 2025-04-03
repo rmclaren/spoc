@@ -31,7 +31,7 @@ class PrepbufrObsBuilder(ObsBuilder):
                 ref_time = datetime(year=int(dump_match.group('year')),
                                     month=int(dump_match.group('month')),
                                     day=int(dump_match.group('day')),
-                                    hour=int(path_components[-1*idx+1]))
+                                    hour=int(path_components[-1*(idx+1) + 1]))
                 break
             elif test_match:
                 ref_time = datetime(year=int(test_match.group('year')),
