@@ -20,19 +20,32 @@ class PrepbufrObsBuilder(ObsBuilder):
 
     def _get_reference_time(self, input_path) -> np.datetime64:
         path_components = Path(input_path).parts
-        m = re.match(r'\w+\.(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})', path_components[-4])
 
-        # raise error if pattern not found
-        if not m.groups():
-            self.log.warning(f'Input file path {input_path} does not contain date information, using the default')
-            ref_time = datetime(year=1970, month=1, day=1)
+        dump_regex = r'\w+\.(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})'
+        test_regex = r'(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})(?P<hour>\d{2})'
+
+        for idx, component in enumerate(reversed(path_components)):
+            dump_match = re.match(dump_regex, component)
+            test_match = re.match(test_regex, component)
+            if dump_match:
+                ref_time = datetime(year=int(dump_match.group('year')),
+                                    month=int(dump_match.group('month')),
+                                    day=int(dump_match.group('day')),
+                                    hour=int(path_components[idx+1]))
+                break
+            elif test_match:
+                ref_time = datetime(year=int(test_match.group('year')),
+                                    month=int(test_match.group('month')),
+                                    day=int(test_match.group('day')),
+                                    hour=int(test_match.group('hour')))
+                break
         else:
-            ref_time = datetime(year=int(m.group('year')),
-                                month=int(m.group('month')),
-                                day=int(m.group('day')),
-                                hour=int(path_components[-3]))
+            # If no match is found, use the last component as a fallback
+            print (f'Reference date not found in path.')
+            ref_time = datetime(year=2020, month=1, day=1)
 
         return np.datetime64(ref_time)
+
 
     def _compute_datetime(self, cycleTimeSinceEpoch, dhr):
         """
