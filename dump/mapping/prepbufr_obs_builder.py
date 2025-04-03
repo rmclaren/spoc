@@ -21,15 +21,12 @@ class PrepbufrObsBuilder(ObsBuilder):
     def _get_reference_time(self, input_path) -> np.datetime64:
         path_components = Path(input_path).parts
 
-        dump_regex = r'\w+\.(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})'
-        test_regex = r'(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})(?P<hour>\d{2})'
+        dump = re.compile(r'\w+\.(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})')
+        test = re.compile(r'(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})(?P<hour>\d{2})')
 
-        for idx, component in enumerate(reversed(path_components)):
-            dump_match = re.match(dump_regex, component)
-            test_match = re.match(test_regex, component)
-
-            if idx == 0:
-                continue
+        for idx, component in enumerate(reversed(path_components[:-1])):
+            dump_match = dump.match(component)
+            test_match = test.match(component)
 
             if dump_match:
                 ref_time = datetime(year=int(dump_match.group('year')),
@@ -44,7 +41,6 @@ class PrepbufrObsBuilder(ObsBuilder):
                                     hour=int(test_match.group('hour')))
                 break
         else:
-            # If no match is found, use the last component as a fallback
             print (f'Reference date not found in path.')
             ref_time = datetime(year=2020, month=1, day=1)
 
