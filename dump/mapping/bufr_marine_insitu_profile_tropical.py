@@ -26,7 +26,7 @@ class MarineInsituProfileTropicalObsBuilder(MarineInsituObsBuilder):
         # buoy_type: ATLAS is 21, TRITON is 22
         buoy_type = container.get("buoyType")
         buoy_mask = np.array([True if x == 21 or x == 22 else False for x in buoy_type])
-        self.filter(buoy_mask & temp_mask & saln_mask)
+        container.apply_mask(buoy_mask & temp_mask & saln_mask)
 
         self._add_preqc_var(container, "waterTemperature")
         self._add_preqc_var(container, "salinity")
