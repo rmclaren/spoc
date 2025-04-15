@@ -18,7 +18,7 @@ bufr:
         timeOffset: "*/DHR"
         transforms:
           - scale: 3600
-        referenceTime: "2021-08-01T00:00:00Z"
+        referenceTime: "1970-01-01T00:00:00Z"
 
     prepbufrDataLevelCategory:
       query: "*/CAT"
@@ -135,11 +135,7 @@ encoder:
       source: variables/longitude
       longName: "Longitude"
       units: "degree_east"
-      #range: [0, 360]
-
-      #    - name: "MetaData/sequenceNumber"
-      #source: variables/sequenceNumber
-      #longName: "Sequence Number (Obs Subtype)"
+      range: [-180, 180]
 
     - name: "MetaData/stationIdentification"
       source: variables/stationIdentification
