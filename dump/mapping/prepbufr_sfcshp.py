@@ -45,7 +45,6 @@ class SfcshpPrepbufrObsBuilder(PrepbufrObsBuilder):
 
         # Get container from mapping file first
         self.log.info('Get container from bufr')
-        #container = self.super().make_obs(comm, input_path)
         container = super().make_obs(comm, input_path)
 
         self.log.debug(f'container list (original): {container.list()}')
@@ -55,7 +54,6 @@ class SfcshpPrepbufrObsBuilder(PrepbufrObsBuilder):
         dhr_paths = container.get_paths('obsTimeMinusCycleTime')
         dhr2 = np.array(dhr)
         self._replace_timestamp(container, self._get_reference_time(input_path))
-        #self._add_timestamp(container, self._get_reference_time(input_path))
 
         self.log.debug(f'Do sequenceNumber (Obs SubType) calculation')
         typ = container.get('observationType')

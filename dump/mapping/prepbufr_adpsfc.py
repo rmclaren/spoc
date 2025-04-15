@@ -24,7 +24,6 @@ class AdpsfcPrepbufrObsBuilder(PrepbufrObsBuilder):
                 'source': 'sequenceNumber',
                 'units': '1',
                 'longName': 'Sequence Number (Obs Subtype)',
-                #'range': ['1','2'],
             }
         ])
         return description
@@ -46,11 +45,8 @@ class AdpsfcPrepbufrObsBuilder(PrepbufrObsBuilder):
 
         container = super().make_obs(comm, input_path)
 
-        print("NICKE inputpath", input_path)
-
         # Get container from mapping file first
         self.log.info('Get container from bufr')
-        #container = bufr.Parser(input_path, mapping_path).parse(comm)
         container = bufr.Parser(input_path, MAPPING_PATH).parse(comm)
 
         self.log.debug(f'container list (original): {container.list()}')
