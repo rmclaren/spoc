@@ -156,10 +156,8 @@ class AcftProfilesPrepbufrObsBuilder(PrepbufrObsBuilder):
         """
     
         ialr_bc = copy.deepcopy(ialr)
-        for i in range(len(ialr_bc)):
-            if ma.is_masked(ialr_bc[i]) and (typ[i] >= 330) and (typ[i] < 340):
-                ialr_bc[i] = float(0)
-    
+        ialr_bc[(ialr_bc.mask) & (typ >= 330) & (typ < 340)] = 0.0
+
         return ialr_bc
 
 
