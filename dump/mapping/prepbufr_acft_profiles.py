@@ -60,7 +60,6 @@ class AcftProfilesPrepbufrObsBuilder(PrepbufrObsBuilder):
         container = super().make_obs(comm, input_path)
 
         self.log.debug(f'container list (original): {container.list()}')
-        #self.log.debug(f'Change longitude range from [0,360] to [-180,180]')
         lon = container.get('longitude')
         lon_paths = container.get_paths('longitude')
     
@@ -76,18 +75,15 @@ class AcftProfilesPrepbufrObsBuilder(PrepbufrObsBuilder):
     
         self.log.debug(f'Compute Obstypes')
         t_ot = container.get('airTemperatureObservationType')
-        #tv_ot = container.get('virtualTemperatureObservationType')
         q_ot = container.get('specificHumidityObservationType')
         uv_ot = container.get('windObservationType')
         ot_paths = container.get_paths('airTemperatureObservationType')
     
         airTemperature = container.get('airTemperatureObsValue')
-        #virtualTemperature = container.get('virtualTemperatureObsValue')
         specificHumidity = container.get('specificHumidityObsValue')
         wind = container.get('windNorthwardObsValue')
     
         ot_airTemperature = self._compute_typ_other(t_ot, airTemperature)
-        #ot_virtualTemperature = self._compute_typ_other(tv_ot, virtualTemperature)
         ot_specificHumidity = self._compute_typ_other(q_ot, specificHumidity)
         ot_wind = self._compute_typ_uv(uv_ot, wind)
     
@@ -99,9 +95,8 @@ class AcftProfilesPrepbufrObsBuilder(PrepbufrObsBuilder):
         ialr_bc = self._compute_ialr_if_masked(uv_ot, ialr2)
     
         self.log.debug(f'Update variables in container')
-        container.replace('instantaneousAltitudeRate', ialr_bc)#, ot_paths)
+        container.replace('instantaneousAltitudeRate', ialr_bc)
         container.replace('airTemperatureObservationType', ot_airTemperature)
-        #container.replace('virtualTemperatureObservationType', ot_virtualTemperature)
         container.replace('specificHumidityObservationType', ot_specificHumidity)
         container.replace('windObservationType', ot_wind)
     
@@ -129,10 +124,6 @@ class AcftProfilesPrepbufrObsBuilder(PrepbufrObsBuilder):
         typ_var[(typ_var > 400) & (typ_var < 500)] -= 300
         typ_var[(typ_var > 500) & (typ_var < 600)] -= 400
     
-        for i in range(len(typ_var)):
-            if ma.is_masked(var[i]):
-                typ_var[i] = typ_var.fill_value
-    
         return typ_var
     
     
@@ -150,10 +141,6 @@ class AcftProfilesPrepbufrObsBuilder(PrepbufrObsBuilder):
         typ_var[(typ_var > 300) & (typ_var < 400)] -= 100
         typ_var[(typ_var > 400) & (typ_var < 500)] -= 200
         typ_var[(typ_var > 500) & (typ_var < 600)] -= 300
-    
-        for i in range(len(typ_var)):
-            if ma.is_masked(var[i]):
-                typ_var[i] = typ_var.fill_value
     
         return typ_var
     

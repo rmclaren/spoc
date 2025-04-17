@@ -44,11 +44,12 @@ class PrepbufrObsBuilder(ObsBuilder):
                                     hour=int(test_match.group('hour')))
                 break
         else:
-            # If no match is found, use the last component as a fallback
+            # If no match is found, use a generic dateTime
             print (f'Reference date not found in path.')
             ref_time = datetime(year=2020, month=1, day=1)
 
         return np.datetime64(ref_time)
+
 
     def _compute_datetime(self, cycleTimeSinceEpoch, dhr):
         """
@@ -77,19 +78,12 @@ class PrepbufrObsBuilder(ObsBuilder):
 
         return dateTime
 
+
     def _replace_timestamp(self, container: bufr.DataContainer, reference_time: np.datetime64) -> np.array:
         times = container.get('obsTimeMinusCycleTime')
-        time_list = []
-    
-        for t in times:
-            if ma.is_masked(t):
-                timestamp = np.int64(0)
-            else:
-                cycle_time = np.timedelta64(int(3600 * t), 's')
-                timestamp = reference_time + cycle_time
-    
-            time_list.append(timestamp)
-    
-        # Convert to UNIX time (seconds since epoch)
-        time_array = np.array(time_list, dtype='datetime64[s]').astype('int64')
-        container.replace('timestamp', time_array)
+
+        cycle_times = ma.masked_array(np.round(3600 * times).astype(np.int), dtype='timedelta64[s]', mask=times.mask)
+        timestamps = ma.masked_array(reference_time + cycle_times, 
+                                     mask=times.mask, dtype='datetime64[s]').astype('int64')
+        
+        container.replace('timestamp', timestamps.filled())

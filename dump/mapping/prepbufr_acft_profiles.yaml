@@ -13,8 +13,6 @@ bufr:
     # ObsType
     airTemperatureObservationType:
       query: "*/TYP"
-    #virtualTemperatureObservationType:
-    #  query: "*/TYP"
     specificHumidityObservationType:
       query: "*/TYP"
     windObservationType:
@@ -26,7 +24,6 @@ bufr:
         timeOffset: "*/DHR"
         transforms:
           - scale: 3600
-        #referenceTime: "2021-08-01T00:00:00Z"
         referenceTime: "1970-01-01T00:00:00Z"
     prepbufrDataLevelCategory:
       query: "*/PRSLEVLA/CAT"
@@ -63,10 +60,6 @@ bufr:
       query: "*/PRSLEVLA/T___INFO/T__EVENT{1}/TOB"
       transforms:
         - offset: 273.15
-#    virtualTemperatureObsValue:
-#      query: "*/PRSLEVLA/T___INFO/TVO"
-#      transforms:
-#        - offset: 273.15
     specificHumidityObsValue:
       query: "*/PRSLEVLA/Q___INFO/Q__EVENT{1}/QOB"
       type: float
@@ -82,8 +75,6 @@ bufr:
       query: "*/PRSLEVLA/P___INFO/P__EVENT{1}/PQM"
     airTemperatureQualityMarker:
       query: "*/PRSLEVLA/T___INFO/T__EVENT{1}/TQM"
-#    virtualTemperatureQualityMarker:
-#      query: "*/PRSLEVLA/T___INFO/T__EVENT{1}/TQM"
     specificHumidityQualityMarker:
       query: "*/PRSLEVLA/Q___INFO/Q__EVENT{1}/QQM"
     windEastwardQualityMarker:
@@ -94,8 +85,6 @@ bufr:
     #ObsError
     airTemperatureObsError:
       query: "*/PRSLEVLA/T___INFO/T__BACKG/TOE"
-#    virtualTemperatureObsError:
-#      query: "*/PRSLEVLA/T___INFO/T__BACKG/TOE"
     specificHumidityObsError:
       query: "*/PRSLEVLA/Q___INFO/Q__BACKG/QOE"
       type: float
@@ -131,10 +120,6 @@ encoder:
     - name: "ObsType/airTemperature"
       source: variables/airTemperatureObservationType
       longName: "Observation Type"
-
-#    - name: "ObsType/virtualTemperature"
-#      source: variables/otherTemperatureObservationType
-#      longName: "Observation Type"
 
     - name: "ObsType/specificHumidity"
       source: variables/specificHumidityObservationType
@@ -208,11 +193,6 @@ encoder:
       longName: "Temperature"
       units: "K"
 
-#    - name: "ObsValue/virtualTemperature"
-#      source: variables/virtualTemperatureObsValue
-#      longName: "Virtual Temperature"
-#      units: "K"
-
     - name: "ObsValue/specificHumidity"
       source: variables/specificHumidityObsValue
       longName: "Specific Humidity"
@@ -233,10 +213,6 @@ encoder:
       source: variables/airTemperatureQualityMarker
       longName: "Air Temperature Quality Marker"
 
-#    - name: "QualityMarker/virtualTemperature"
-#      source: variables/virtualTemperatureQualityMarker
-#      longName: "Virtual Temperature Quality Marker"
-
     - name: "QualityMarker/specificHumidity"
       source: variables/specificHumidityQualityMarker
       longName: "specific Humidity Quality Marker"
@@ -254,11 +230,6 @@ encoder:
       source: variables/airTemperatureObsError
       longName: "Air Temperature Error"
       units: "K"
-
-#    - name: "ObsError/virtualTemperature"
-#      source: variables/virtualTemperatureObsError
-#      longName: "Virtual Temperature Error"
-#      units: "K"
 
     - name: "ObsError/specificHumidity"
       source: variables/specificHumidityObsError
