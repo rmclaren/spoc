@@ -77,9 +77,14 @@ class OceanBasin:
 
 class MarineInsituObsBuilder(ObsBuilder):
     def __init__(self, mapping_path, log_name=os.path.basename(__file__), config=None):
-        super().__init__(mapping_path, log_name=log_name, config=config)
+        # print(f'===============================>>>><<<<')
+        # print(f'config = {config}')
+        # print(f'===============================>>>><<<<')
+        self.ocean_basin_file = config['ocean_basin'] if 'ocean_basin' in config else None
+        # print(f'self.ocean_basin_file = {self.ocean_basin_file}')
+        # print(f'config = {config}')
 
-        self.ocean_basin_file = config['OCEAN_BASIN_FILE'] if 'OCEAN_BASIN_FILE' in config else None
+        super().__init__(mapping_path, log_name=log_name, config=config)
 
     def make_obs(self, comm, input_path):
         container = super().make_obs(comm, input_path)
@@ -89,6 +94,7 @@ class MarineInsituObsBuilder(ObsBuilder):
         else:
             self.log.warning(f"No ocean basin file provided, or can not be found")
 
+        # print("MMMMMMMMMMMMMMMMMM")
         return container
 
     def _make_description(self):
@@ -106,14 +112,18 @@ class MarineInsituObsBuilder(ObsBuilder):
     def _add_preqc_var(self, container, name):
         v = container.get(name)
         paths = container.get_paths(name)
-        preqc_name = f"preQC{name}"
+        preqc_name = f"PreQC{name}"
         preqc = np.zeros_like(v)
         container.add(preqc_name, preqc, paths)
 
     def _add_error_var(self, container, name, error):
         v = container.get(name)
         paths = container.get_paths(name)
-        error_var_name = f"obsError{name}"
+        # print(">>>>>>>>>>>>>>>>>>>>>>")
+        # print(f"_add_error_var {name}")
+        error_var_name = f"ObsError{name}"
+        # print(f"_add_error_var {error_var_name}")
+        # print(">>>>>>>>>>>>>>>>>>>>>>")
         error_var = np.full_like(v, error)
         container.add(error_var_name, error_var, paths)
 
@@ -124,7 +134,7 @@ class MarineInsituObsBuilder(ObsBuilder):
         combined = np.stack((lon, lat), axis=-1)
         unique_combined, seq_num = np.unique(combined, axis=0, return_inverse=True)
         v = np.ma.masked_array(seq_num, mask=lon.mask)
-        container.add("sequenceNumber", v, paths)
+        container.add("SequenceNumber", v, paths)
 
     def _add_ocean_basin(self, container, nc_file_path):
         lon = container.get("longitude")

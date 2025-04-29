@@ -90,10 +90,10 @@ encoder:
       longName: "Longitude"
       units: "degrees_east"
 
-    - name: "MetaData/depth"
-      source: variables/depth
-      longName: "Water depth"
-      units: "m"
+    # - name: "MetaData/depth"
+      # source: variables/depth
+      # longName: "Water depth"
+      # units: "m"
 
     - name: "ObsValue/waterTemperature"
       source: variables/seaSurfaceTemperature

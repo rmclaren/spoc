@@ -95,8 +95,8 @@ encoder:
       longName: "PreQC Sea Surface Temperature"
       units: ""
 
-    - name: "MetaData/oceanBasin"
-      source: variables/OceanBasin
-      longName: "Ocean Basin"
-      units: ""
+    # - name: "MetaData/oceanBasin"
+      # source: variables/OceanBasin
+      # longName: "Ocean Basin"
+      # units: ""
 

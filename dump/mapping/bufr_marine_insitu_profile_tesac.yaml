@@ -134,8 +134,8 @@ encoder:
       longName: "Sequence Number"
       units: ""
 
-    - name: "MetaData/oceanBasin"
-      source: variables/OceanBasin
-      longName: "Ocean Basin"
-      units: ""
+    # - name: "MetaData/oceanBasin"
+      # source: variables/OceanBasin
+      # longName: "Ocean Basin"
+      # units: ""
 

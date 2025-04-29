@@ -28,7 +28,15 @@ class MarineInsituSurfaceDrifterObsBuilder(MarineInsituObsBuilder):
         # 5 - SVPG Standard Lagrangian drifter with GPS
         buoy_mask = np.isin(buoy_type,  [1, 4, 5])
 
-        container.apply_mask(buoy_mask & temp_mask)
+        print("BBBBBBBBBBBBBBBBBBB")
+        print(buoy_mask)
+        print(temp_mask.size)
+        print(buoy_type.size)
+        print(buoy_mask.size)
+        print(np.count_nonzero(buoy_mask))
+        print(np.count_nonzero(temp_mask))
+        print("BBBBBBBBBBBBBBBBBBB")
+        # container.apply_mask(buoy_mask & temp_mask)
 
         self._add_preqc_var(container, "seaSurfaceTemperature")
         self._add_preqc_var(container, "salinity")
