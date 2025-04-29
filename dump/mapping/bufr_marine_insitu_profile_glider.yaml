@@ -29,6 +29,7 @@ bufr:
 
     depth:
         query: "*/GLPFDATA/WPRES"
+        type: float
         transforms:
           - scale: 0.0001   # convert from Pa to dbar
 

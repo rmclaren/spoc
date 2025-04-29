@@ -34,11 +34,11 @@ class MarineInsituProfileGliderObsBuilder(MarineInsituObsBuilder):
 
         container.apply_mask(id_mask & temp_mask & saln_mask)
 
-        self._add_preqc_var("waterTemperature")
-        self._add_preqc_var("salinity")
-        self._add_error_var("waterTemperature", error=0.02)
-        self._add_error_var("salinity", error=0.01)
-        self._add_seq_num()
+        self._add_preqc_var(container, "waterTemperature")
+        self._add_preqc_var(container, "salinity")
+        self._add_error_var(container, "waterTemperature", error=0.02)
+        self._add_error_var(container, "salinity", error=0.01)
+        self._add_seq_num(container)
 
         return container
 
