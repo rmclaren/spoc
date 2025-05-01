@@ -47,4 +47,4 @@ class SatWndAmvModisObsBuilder(SatWndAmvObsBuilder):
         return obstype
 
 # Add main functions create_obs_file and create_obs_group
-add_main_functions(SatWndAmvModisObsBuilder, uses_categories=True, uses_cache=True)
+add_main_functions(SatWndAmvModisObsBuilder)

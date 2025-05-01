@@ -25,4 +25,4 @@ class SatWndAmvLeogeoObsBuilder(SatWndAmvObsBuilder):
 
         return obstype
 
-add_main_functions(SatWndAmvLeogeoObsBuilder, uses_categories=True, uses_cache=True)
+add_main_functions(SatWndAmvLeogeoObsBuilder)

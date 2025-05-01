@@ -46,4 +46,4 @@ class SatWndAmvViirsObsBuilder(SatWndAmvObsBuilder):
 
 
 # Add main functions create_obs_file and create_obs_group
-add_main_functions(SatWndAmvViirsObsBuilder, uses_categories=True, uses_cache=True)
+add_main_functions(SatWndAmvViirsObsBuilder)

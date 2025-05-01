@@ -49,4 +49,4 @@ class SatWndAmvAhiObsBuilder(SatWndAmvObsBuilder):
         return obstype
 
 
-add_main_functions(SatWndAmvAhiObsBuilder, uses_categories=True, use_cache=True)
+add_main_functions(SatWndAmvAhiObsBuilder)

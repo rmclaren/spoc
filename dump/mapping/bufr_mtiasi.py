@@ -38,4 +38,4 @@ class BufrMtiasiObsBuilder(ObsBuilder):
     
         return container
 
-add_main_functions(BufrMtiasiObsBuilder, uses_categories=True, uses_cache=True)
+add_main_functions(BufrMtiasiObsBuilder)

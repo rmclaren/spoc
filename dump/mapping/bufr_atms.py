@@ -38,4 +38,4 @@ class BufrAtmsObsBuilder(ObsBuilder):
     
         return container
 
-add_main_functions(BufrAtmsObsBuilder, uses_categories=True, uses_cache=True)
+add_main_functions(BufrAtmsObsBuilder)
