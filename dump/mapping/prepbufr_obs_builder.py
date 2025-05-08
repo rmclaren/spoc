@@ -11,9 +11,11 @@ from datetime import datetime
 import bufr
 from bufr.obs_builder import ObsBuilder
 
+
 def map_path(map_file_name):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(script_dir, map_file_name)
+
 
 class PrepbufrObsBuilder(ObsBuilder):
     def __init__(self, mapping_path, log_name=os.path.basename(__file__)):
@@ -44,12 +46,10 @@ class PrepbufrObsBuilder(ObsBuilder):
                                     hour=int(test_match.group('hour')))
                 break
         else:
-            # If no match is found, use a generic dateTime
-            print (f'Reference date not found in path.')
+            print(f'Reference date not found in path.')
             ref_time = datetime(year=2020, month=1, day=1)
 
         return np.datetime64(ref_time)
-
 
     def _compute_datetime(self, cycleTimeSinceEpoch, dhr):
         """
