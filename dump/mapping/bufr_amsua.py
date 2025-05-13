@@ -1,19 +1,35 @@
 #!/usr/bin/env python3
+import json
+import netCDF4 as nc
 import os
-import numpy as np
-import numpy.ma as ma
 
 import bufr
-from bufr.obs_builder import ObsBuilder, add_main_functions, map_path
+from bufr.obs_builder import ObsBuilder, add_main_functions
 
 YAML_NORMAL = False  # current as normal need remap for path2/1bama
 INVALID = 1000.0
+AMUA_1B = '1bamua'
+AMUA_ES = 'esamua'
 
 # Cosmic background temperature. Taken from Mather,J.C. et. al., 1999, "Calibrator Design for the COBE
 # Far-Infrared Absolute Spectrophotometer (FIRAS)"Astrophysical Journal, vol 512, pp 511-520
 COSMIC_BACKGROUND_TEMP = 2.7253
 
 nc_dir = './aux'
+
+
+def map_path(map_file_name):
+    """
+    Get the absolute path to a mapping file.
+    :param map_file_name: Name of the mapping file.
+    :type map_file_name: str
+    :return: Absolute path to the mapping file.
+    :rtype: str
+    """
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(script_dir, map_file_name)
+
 
 AMUA_1B_MAPPING = map_path('bufr_amsua_1bamua.yaml')
 AMUA_ES_MAPPING = map_path('bufr_amsua_esamua.yaml')
@@ -34,8 +50,8 @@ class ACCoeff:
 
 class AmsuaObsBuilder(ObsBuilder):
     def __init__(self):
-        map_dict = {'1bamua': AMUA_1B_MAPPING,
-                    'esamua': AMUA_ES_MAPPING}
+        map_dict = {AMUA_1B: AMUA_1B_MAPPING,
+                    AMUA_ES: AMUA_ES_MAPPING}
 
         super().__init__(map_dict, log_name=os.path.basename(__file__))
 
@@ -70,7 +86,7 @@ class AmsuaObsBuilder(ObsBuilder):
                 ta[:, i] = x
         return ta
 
-    def _re_map_variable(self, comm, container):
+    def _re_map_variable(self, container):
         # read_bufrtovs.f90
         # antcorr_application.f90
         # search the keyword “ta2tb” for details
@@ -80,18 +96,22 @@ class AmsuaObsBuilder(ObsBuilder):
             ta = container.get('variables/brightnessTemperature', sat_id)
             if ta.shape[0]:
                 ifov = container.get('variables/fieldOfViewNumber', sat_id)
-                tb = self._apply_corr(comm, sat_id[0], ta, ifov)
+                tb = self._apply_corr(sat_id[0], ta, ifov)
                 container.replace('variables/brightnessTemperature', tb, sat_id)
 
     def make_obs(self, comm, input_path):
+        if isinstance(input_path, str):
+            input_path = json.loads(input_path)
         if not isinstance(input_path, dict) and len(self.map_dict) != 2:
             raise ValueError('The input must be a dict with two items!')
-
-        container_es = bufr.Parser(input_path['esamua'], self.map_dict['esamua']).parse(comm)
-        container_1b = bufr.Parser(input_path['1bamua'], self.map_dict['1bamua']).parse(comm)
+        
+        self.log.info(f'input files: {input_path["esamua"]}, {input_path["1bamua"]}')
+        self.log.info(f'maping files: {self.map_dict["esamua"]}, {self.map_dict["1bamua"]}')
+        container_es = bufr.Parser(input_path[AMUA_ES], self.map_dict[AMUA_ES]).parse(comm)
+        container_1b = bufr.Parser(input_path[AMUA_1B], self.map_dict[AMUA_1B]).parse(comm)
 
         container = container_es
-        self._re_map_variable(comm, container_1b)
+        self._re_map_variable(container_1b)
         container.append(container_1b)
         return container
 
