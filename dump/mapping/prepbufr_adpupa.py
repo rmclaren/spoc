@@ -2,7 +2,7 @@
 import os
 import numpy as np
 import time
-import calendar 
+import calendar
 from datetime import datetime
 
 import bufr
