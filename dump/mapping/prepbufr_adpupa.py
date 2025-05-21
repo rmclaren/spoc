@@ -2,7 +2,7 @@
 import os
 import numpy as np
 import time
-import calendar 
+import calendar
 from datetime import datetime
 
 import bufr
@@ -10,6 +10,7 @@ from bufr.obs_builder import ObsBuilder, add_main_functions, map_path
 from prepbufr_obs_builder import PrepbufrObsBuilder
 
 MAPPING_PATH = map_path('prepbufr_adpupa.yaml')
+
 
 class AdpupaPrepbufrObsBuilder(PrepbufrObsBuilder):
     """
@@ -39,8 +40,7 @@ class AdpupaPrepbufrObsBuilder(PrepbufrObsBuilder):
         self.log.debug(f'Perform DateTime calculation')
         hrdr = container.get('obsTimeMinusCycleTime')
         hrdr_paths = container.get_paths('obsTimeMinusCycleTime')
-        #hrdr = np.array(hrdr)
-        hrdr = np.array(hrdr, dtype=object)
+        hrdr = np.array(hrdr)
         self._replace_timestamp(container, self._get_reference_time(input_path))
 
         self.log.debug(f'Perform stationPressure, stationPressureQM, and stationPressureError calculations')
