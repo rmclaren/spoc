@@ -20,14 +20,15 @@ class AdpupaPrepbufrObsBuilder(PrepbufrObsBuilder):
     def __init__(self):
         super().__init__(MAPPING_PATH, log_name=os.path.basename(__file__))
 
-    def compute_conditional_array(self, source_array, condition_array, condition_mask):
+    def compute_conditional_array(self, source_array, condition_mask):
         """
-        Utility function to compute an array with conditional values.
-        Returns a new array where values from source_array are retained
+        Compute an array where values from source_array are retained
         if condition_mask is True, else fill_value is used.
         """
-        result = np.full(source_array.shape[0], source_array.fill_value)
-        return np.where(condition_mask, source_array, result)
+
+        result = np.full(source_array.shape, source_array.fill_value)
+        result[condition_mask] = source_array[condition_mask]
+        return result
 
     def make_obs(self, comm, input_path):
 
@@ -39,8 +40,6 @@ class AdpupaPrepbufrObsBuilder(PrepbufrObsBuilder):
 
         self.log.debug(f'Perform DateTime calculation')
         hrdr = container.get('obsTimeMinusCycleTime')
-        hrdr_paths = container.get_paths('obsTimeMinusCycleTime')
-        hrdr = np.array(hrdr)
         self._replace_timestamp(container, self._get_reference_time(input_path))
 
         self.log.debug(f'Perform stationPressure, stationPressureQM, and stationPressureError calculations')
@@ -49,9 +48,9 @@ class AdpupaPrepbufrObsBuilder(PrepbufrObsBuilder):
         pqm = container.get('pressureQualityMarker')
         poe = container.get('pressureError')
 
-        station_pressure = self.compute_conditional_array(pob, cat, cat == 0)
-        station_pressureQM = self.compute_conditional_array(pqm, cat, cat == 0)
-        station_pressureError = self.compute_conditional_array(poe, cat, cat == 0)
+        station_pressure = self.compute_conditional_array(pob, cat == 0)
+        station_pressureQM = self.compute_conditional_array(pqm, cat == 0)
+        station_pressureError = self.compute_conditional_array(poe, cat == 0)
 
         self.log.debug(f'Perform airTemperature, airTemperatureQM, and airTemperatureError calculations')
         tpc = container.get('temperatureEventProgramCode')
@@ -59,14 +58,14 @@ class AdpupaPrepbufrObsBuilder(PrepbufrObsBuilder):
         tobqm = container.get('temperatureQualityMarker')
         toboe = container.get('temperatureError')
 
-        air_temperature = self.compute_conditional_array(tob, tpc, (tpc >= 1) & (tpc < 8))
-        air_temperatureQM = self.compute_conditional_array(tobqm, tpc, (tpc >= 1) & (tpc < 8))
-        air_temperatureError = self.compute_conditional_array(toboe, tpc, (tpc >= 1) & (tpc < 8))
+        air_temperature = self.compute_conditional_array(tob, (tpc >= 1) & (tpc < 8))
+        air_temperatureQM = self.compute_conditional_array(tobqm, (tpc >= 1) & (tpc < 8))
+        air_temperatureError = self.compute_conditional_array(toboe, (tpc >= 1) & (tpc < 8))
 
         self.log.debug(f'Perform virtualTemperature, virtualTemperatureQM, and virtualTemperatureError calculations')
-        virtual_temperature = self.compute_conditional_array(tob, tpc, tpc == 8)
-        virtual_temperatureQM = self.compute_conditional_array(tobqm, tpc, tpc == 8)
-        virtual_temperatureError = self.compute_conditional_array(toboe, tpc, tpc == 8)
+        virtual_temperature = self.compute_conditional_array(tob, tpc == 8)
+        virtual_temperatureQM = self.compute_conditional_array(tobqm, tpc == 8)
+        virtual_temperatureError = self.compute_conditional_array(toboe, tpc == 8)
 
         self.log.debug(f'Update variables into container')
         container.replace('airTemperature', air_temperature)
