@@ -42,9 +42,7 @@ bufr:
     height:
       query: "*/PRSLEVEL/Z___INFO/Z__EVENT{1}/ZOB"
       type: float
-    
-    # QCFlags     
-    temperatureEventProgramCode:
+    temperatureEventCode:
       query: "*/PRSLEVEL/T___INFO/T__EVENT{1}/TPC"
         
     # ObsValue
@@ -75,7 +73,9 @@ bufr:
       query: "*/PRSLEVEL/P___INFO/P__EVENT{1}/PQM"
     heightQualityMarker:
       query: "*/PRSLEVEL/Z___INFO/Z__EVENT{1}/ZQM"
-    temperatureQualityMarker:
+    airTemperatureQualityMarker:
+      query: "*/PRSLEVEL/T___INFO/T__EVENT{1}/TQM"
+    virtualTemperatureQualityMarker:
       query: "*/PRSLEVEL/T___INFO/T__EVENT{1}/TQM"
     windQualityMarker:
       query: "*/PRSLEVEL/W___INFO/W__EVENT{1}/WQM"
@@ -87,7 +87,11 @@ bufr:
       query: "*/PRSLEVEL/P___INFO/P__BACKG/POE"
       transforms:
         - scale: 100
-    temperatureError:
+    airTemperatureError:
+      query: "*/PRSLEVEL/T___INFO/T__BACKG/TOE"
+      transforms:
+        - offset: 273.15
+    virtualTemperatureError:
       query: "*/PRSLEVEL/T___INFO/T__BACKG/TOE"
       transforms:
         - offset: 273.15
@@ -125,15 +129,25 @@ encoder:
       source: variables/observationType
       longName: "Pressure Observation Type"
 
-    # Observation Type: temperature
-    - name: "ObsType/temperature"
+    # Observation Type: airTemperature
+    - name: "ObsType/airTemperature"
       source: variables/observationType
-      longName: "Temperature Observation Type"
+      longName: "airTemperature Observation Type"
 
-    # Observation Type: wind
-    - name: "ObsType/wind"
+    # Observation Type: virtualTemperature
+    - name: "ObsType/virtualTemperature"
       source: variables/observationType
-      longName: "Wind Observation Type"
+      longName: "virtualTemperature Observation Type"
+
+    # Observation Type: windEastward
+    - name: "ObsType/windEastward"
+      source: variables/observationType
+      longName: "Eastward Wind Observation Type"
+
+    # Observation Type: windNorthward
+    - name: "ObsType/windNorthward"
+      source: variables/observationType
+      longName: "Northward Wind Observation Type"
 
     # Observation Type: specificHumidity
     - name: "ObsType/specificHumidity"
@@ -171,11 +185,6 @@ encoder:
       longName: "Height of Station"
       units: "m"
 
-    # MetaData: temperatureEventProgramCode
-    - name: "MetaData/temperatureEventProgramCode"
-      source: variables/temperatureEventProgramCode
-      longName: "Temperature Event Code"
-
     # MetaData: prepbufrDataLevelCategory
     - name: "MetaData/prepbufrDataLevelCategory"
       source: variables/prepbufrDataLevelCategory
@@ -193,9 +202,9 @@ encoder:
       longName: "Height of Observation"
       units: "m"
 
-    # QCFlags: qualityFlags
-    - name: "QCFlags/qualityFlags"
-      source: variables/temperatureEventProgramCode
+    # MetaData: temperatureEventCode
+    - name: "MetaData/temperatureEventCode"
+      source: variables/temperatureEventCode
       longName: "Temperature Event Program Code"
 
     # ObsValue: airTemperature
@@ -244,15 +253,25 @@ encoder:
       source: variables/heightQualityMarker
       longName: "Height Quality Marker"
 
-    # QualityMarker: temperature
-    - name: "QualityMarker/temperature"
-      source: variables/temperatureQualityMarker
-      longName: "Temperature Quality Marker"
+    # QualityMarker: airTemperature
+    - name: "QualityMarker/airTemperature"
+      source: variables/airTemperatureQualityMarker
+      longName: "airTemperature Quality Marker"
 
-    # QualityMarker: wind
-    - name: "QualityMarker/wind"
+    # QualityMarker: virtualTemperature
+    - name: "QualityMarker/virtualTemperature"
+      source: variables/virtualTemperatureQualityMarker
+      longName: "virtualTemperature Quality Marker"
+
+    # QualityMarker: windEastward
+    - name: "QualityMarker/windEastward"
       source: variables/windQualityMarker
-      longName: "Wind Quality Marker"
+      longName: "Eastward Wind Quality Marker"
+
+    # QualityMarker: windNorthward
+    - name: "QualityMarker/windNorthward"
+      source: variables/windQualityMarker
+      longName: "Northward Wind Quality Marker"
 
     # QualityMarker: specificHumidity
     - name: "QualityMarker/specificHumidity"
@@ -265,16 +284,28 @@ encoder:
       longName: "Pressure Error"
       units: "Pa"
 
-    # ObsError: temperature
-    - name: "ObsError/temperature"
-      source: variables/temperatureError
-      longName: "Temperature Error"
+    # ObsError: airTemperature
+    - name: "ObsError/airTemperature"
+      source: variables/airTemperatureError
+      longName: "airTemperature Error"
       units: "K"
 
-    # ObsError: wind
-    - name: "ObsError/wind"
+    # ObsError: virtualTemperature
+    - name: "ObsError/virtualTemperature"
+      source: variables/virtualTemperatureError
+      longName: "virtualTemperature Error"
+      units: "K"
+
+    # ObsError: windEastward
+    - name: "ObsError/windEastward"
       source: variables/windError
-      longName: "Wind Error"
+      longName: "Eastward Wind Error"
+      units: "m s-1"
+
+    # ObsError: windNorthward
+    - name: "ObsError/windNorthward"
+      source: variables/windError
+      longName: "NorthwardWind Error"
       units: "m s-1"
 
     # ObsError: specificHumidity

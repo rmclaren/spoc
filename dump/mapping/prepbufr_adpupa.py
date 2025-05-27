@@ -53,10 +53,10 @@ class AdpupaPrepbufrObsBuilder(PrepbufrObsBuilder):
         station_pressureError = self.compute_conditional_array(poe, cat == 0)
 
         self.log.debug(f'Perform airTemperature, airTemperatureQM, and airTemperatureError calculations')
-        tpc = container.get('temperatureEventProgramCode')
+        tpc = container.get('temperatureEventCode')
         tob = container.get('airTemperature')
-        tobqm = container.get('temperatureQualityMarker')
-        toboe = container.get('temperatureError')
+        tobqm = container.get('airTemperatureQualityMarker')
+        toboe = container.get('airTemperatureError')
 
         air_temperature = self.compute_conditional_array(tob, (tpc >= 1) & (tpc < 8))
         air_temperatureQM = self.compute_conditional_array(tobqm, (tpc >= 1) & (tpc < 8))
@@ -70,16 +70,16 @@ class AdpupaPrepbufrObsBuilder(PrepbufrObsBuilder):
         self.log.debug(f'Update variables into container')
         container.replace('airTemperature', air_temperature)
         container.replace('virtualTemperature', virtual_temperature)
+        container.replace('airTemperatureQualityMarker', air_temperatureQM)
+        container.replace('airTemperatureError', air_temperatureError)
+        container.replace('virtualTemperatureQualityMarker', virtual_temperatureQM)
+        container.replace('virtualTemperatureError', virtual_temperatureError)
 
         self.log.debug(f'Add new/derived variables into container')
         ydr_paths = container.get_paths('latitude')
         container.add('stationPressure', station_pressure, ydr_paths)
         container.add('stationPressureQualityMarker', station_pressureQM, ydr_paths)
         container.add('stationPressureError', station_pressureError, ydr_paths)
-        container.add('airTemperatureQualityMarker', air_temperatureQM, ydr_paths)
-        container.add('airTemperatureError', air_temperatureError, ydr_paths)
-        container.add('virtualTemperatureQualityMarker', virtual_temperatureQM, ydr_paths)
-        container.add('virtualTemperatureError', virtual_temperatureError, ydr_paths)
 
         self.log.debug(f'container list (updated): {container.list()}')
 
@@ -106,30 +106,6 @@ class AdpupaPrepbufrObsBuilder(PrepbufrObsBuilder):
                 'source': 'stationPressureError',
                 'units': 'Pa',
                 'longName': 'Station Pressure Error',
-            },
-            {
-                'name': 'QualityMarker/airTemperature',
-                'source': 'airTemperatureQualityMarker',
-                'units': '',
-                'longName': 'Air Temperature Quality Marker',
-            },
-            {
-                'name': 'ObsError/airTemperature',
-                'source': 'airTemperatureError',
-                'units': 'K',
-                'longName': 'Air Temperature Error',
-            },
-            {
-                'name': 'QualityMarker/virtualTemperature',
-                'source': 'virtualTemperatureQualityMarker',
-                'units': '',
-                'longName': 'Virtual Temperature Quality Marker',
-            },
-            {
-                'name': 'ObsError/virtualTemperature',
-                'source': 'virtualTemperatureError',
-                'units': 'K',
-                'longName': 'Virtual Temperature Error',
             },
         ])
 
