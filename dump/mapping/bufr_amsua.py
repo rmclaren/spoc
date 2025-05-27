@@ -4,7 +4,7 @@ import netCDF4 as nc
 import os
 
 import bufr
-from bufr.obs_builder import ObsBuilder, add_main_functions
+from bufr.obs_builder import ObsBuilder, add_main_functions, map_path
 
 YAML_NORMAL = False  # current as normal need remap for path2/1bama
 INVALID = 1000.0
@@ -16,19 +16,6 @@ AMUA_ES = 'esamua'
 COSMIC_BACKGROUND_TEMP = 2.7253
 
 nc_dir = './aux'
-
-
-def map_path(map_file_name):
-    """
-    Get the absolute path to a mapping file.
-    :param map_file_name: Name of the mapping file.
-    :type map_file_name: str
-    :return: Absolute path to the mapping file.
-    :rtype: str
-    """
-
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_dir, map_file_name)
 
 
 AMUA_1B_MAPPING = map_path('bufr_amsua_1bamua.yaml')
