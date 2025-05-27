@@ -42,6 +42,22 @@ class AmsuaObsBuilder(ObsBuilder):
 
         super().__init__(map_dict, log_name=os.path.basename(__file__))
 
+    def make_obs(self, comm, input_path):
+        if isinstance(input_path, str):
+            input_path = json.loads(input_path)
+        if not isinstance(input_path, dict) and len(self.map_dict) != 2:
+            raise ValueError('The input must be a dict with two items!')
+
+        self.log.info(f'input files: {input_path["esamua"]}, {input_path["1bamua"]}')
+        self.log.info(f'maping files: {self.map_dict["esamua"]}, {self.map_dict["1bamua"]}')
+        container_es = bufr.Parser(input_path[AMUA_ES], self.map_dict[AMUA_ES]).parse(comm)
+        container_1b = bufr.Parser(input_path[AMUA_1B], self.map_dict[AMUA_1B]).parse(comm)
+
+        container = container_es
+        self._re_map_variable(container_1b)
+        container.append(container_1b)
+        return container
+
     def _remove_ant_corr(self, i, ac, ifov, t):
         # AC:             Structure containing the antenna correction coefficients for the sensor of interest.
         # iFOV:           The FOV index for a scanline of the sensor of interest.
@@ -86,22 +102,5 @@ class AmsuaObsBuilder(ObsBuilder):
                 tb = self._apply_corr(sat_id[0], ta, ifov)
                 container.replace('variables/brightnessTemperature', tb, sat_id)
 
-    def make_obs(self, comm, input_path):
-        if isinstance(input_path, str):
-            input_path = json.loads(input_path)
-        if not isinstance(input_path, dict) and len(self.map_dict) != 2:
-            raise ValueError('The input must be a dict with two items!')
-        
-        self.log.info(f'input files: {input_path["esamua"]}, {input_path["1bamua"]}')
-        self.log.info(f'maping files: {self.map_dict["esamua"]}, {self.map_dict["1bamua"]}')
-        container_es = bufr.Parser(input_path[AMUA_ES], self.map_dict[AMUA_ES]).parse(comm)
-        container_1b = bufr.Parser(input_path[AMUA_1B], self.map_dict[AMUA_1B]).parse(comm)
-
-        container = container_es
-        self._re_map_variable(container_1b)
-        container.append(container_1b)
-        return container
-
 
 add_main_functions(AmsuaObsBuilder)
-
