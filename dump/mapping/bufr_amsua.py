@@ -45,7 +45,7 @@ class AmsuaObsBuilder(ObsBuilder):
     def make_obs(self, comm, input_path):
         if isinstance(input_path, str):
             input_path = json.loads(input_path)
-        if not isinstance(input_path, dict) and len(self.map_dict) != 2:
+        if not (isinstance(input_path, dict) and len(self.map_dict) == 2):
             raise ValueError('The input must be a dict with two items!')
 
         self.log.info(f'input files: {input_path["esamua"]}, {input_path["1bamua"]}')
