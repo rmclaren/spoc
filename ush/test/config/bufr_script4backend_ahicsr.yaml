@@ -14,8 +14,7 @@ observations:
         type: script 
         script file: "bufr_ahicsr.py"
         args:
-          input: "./testinput/2021080100/gdas.t00z.ahicsr.tm00.bufr_d"
-            #input_path: "./testinput/2021080100/gdas.t00z.ahicsr.tm00.bufr_d"
+          input_path: "./testinput/2021080100/gdas.t00z.ahicsr.tm00.bufr_d"
           mapping_path: "./bufr_ahicsr.yaml"
             category: "h8"
     obsdataout:
