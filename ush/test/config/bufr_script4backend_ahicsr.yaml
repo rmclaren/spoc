@@ -11,7 +11,7 @@ observations:
     simulated variables: [cloudAmount]
     obsdatain:
       engine:
-        type: script 
+        type: script
         script file: "bufr_ahicsr.py"
         args:
           input_path: "./testinput/2021080100/gdas.t00z.ahicsr.tm00.bufr_d"
@@ -21,3 +21,21 @@ observations:
       engine:
         type: H5File
         obsfile: "./testoutput/2021080100/script4backend/gdas.t00z.ahicsr_h8.tm00.nc"
+
+- obs space:
+    name: "ahicsr-h9"
+    observed variables: [cloudAmount]
+    derived variables: [cloudAmount]
+    simulated variables: [cloudAmount]
+    obsdatain:
+      engine:
+        type: script
+        script file: "bufr_ahicsr.py"
+        args:
+          input_path: "./testinput/2021080100/gdas.t00z.ahicsr.tm00.bufr_d"
+          mapping_path: "./bufr_ahicsr.yaml"
+            category: "h9"
+    obsdataout:
+      engine:
+        type: H5File
+        obsfile: "./testoutput/2021080100/script4backend/gdas.t00z.ahicsr_h9.tm00.nc"
