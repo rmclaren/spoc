@@ -115,11 +115,11 @@ encoder:
 
     - name: "providerFullName"
       type: string
-      value: "Japan Meteorological Agencyi (JMA)"
+      value: "Japan Meteorological Agency (JMA)"
 
     - name: "source"
       type: string
-      value: "U.S. National Weather Service, National Centres for Environmental Prediction (NCEP)"
+      value: "U.S. National Weather Service, National Centers for Environmental Prediction (NCEP)"
 
     - name: "sourceFiles"
       type: string
