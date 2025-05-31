@@ -15,7 +15,7 @@ class BufrOzoneOmpstcObsBuilder(ObsBuilder):
     Class for building observations from ompst8 BUFR data.
 
     This class extends `ObsBuilder` to include specific logic for processing
-    Level-2 retrived total ozone data from OMPS nadir mapper 
+    Level-2 retrived total ozone data from OMPS nadir mapper
 
     :param mapping_path: Path to the mapping file.
     :type mapping_path: str
@@ -75,7 +75,7 @@ class BufrOzoneOmpstcObsBuilder(ObsBuilder):
             add_dummy_variable(container, 'pressure', cat, 'latitude')
             return
 
-        latitude = container.get('latitude',cat) 
+        latitude = container.get('latitude', cat)
         paths = container.get_paths('latitude', cat)
 
         pressure = np.full_like(latitude, 0)

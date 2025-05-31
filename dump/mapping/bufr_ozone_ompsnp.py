@@ -4,19 +4,20 @@ import numpy as np
 import numpy.ma as ma
 
 import bufr
-from bufr.bufr_python.encoders import netcdf 
+from bufr.bufr_python.encoders import netcdf
 from bufr.obs_builder import ObsBuilder, add_main_functions, add_dummy_variable, map_path
 
 
 MAPPING_PATH = map_path('bufr_ozone_ompsnp.yaml')
 USE_REFERENCE_PRESSURE = True
 
+
 class BufrOzoneOmpsnpObsBuilder(ObsBuilder):
     """
     Class for building observations from ompsn8 BUFR data.
 
     This class extends `ObsBuilder` to include specific logic for processing
-    Level-2 retrived profile ozone data from OMPS nadir profiler 
+    Level-2 retrived profile ozone data from OMPS nadir profiler
 
     :param mapping_path: Path to the mapping file.
     :type mapping_path: str
@@ -87,20 +88,20 @@ class BufrOzoneOmpsnpObsBuilder(ObsBuilder):
         if not satId.size:
             self.log.warning(f'category {cat[0]} does not exist in input file')
             add_dummy_variable(container, 'pressure', cat, 'latitude')
-            pbot = container.get('bottomLevelPressure',cat) 
-            ptop = container.get('topLevelPressure',cat) 
+            pbot = container.get('bottomLevelPressure', cat)
+            ptop = container.get('topLevelPressure', cat)
             pressureVertice = np.column_stack((ptop, pbot))
             pathLocation = container.get_paths('latitude', cat)
             pathPressure = [pathLocation[0], '*/VERTICE']
             container.add('pressureVertice', pressureVertice, pathPressure, cat)
             return
 
-        o3val = container.get('ozoneLayer',cat) 
-        nlevs = 21 
+        o3val = container.get('ozoneLayer', cat)
+        nlevs = 21
         nprofs = int(o3val.shape[0]/nlevs)
 
         # Set reference pressure
-        if USE_REFERENCE_PRESSURE: 
+        if USE_REFERENCE_PRESSURE:
             # Set reference pressure vertices (define pressyre boundaries (in hPa))
             # These pressure vertices are defined in GSI ozinfo
             ptop = np.array([631.000, 398.000, 251.000, 158.000, 100.000, 63.100,
@@ -123,10 +124,10 @@ class BufrOzoneOmpsnpObsBuilder(ObsBuilder):
             pressureVertice = np.tile(pres, (nprofs, 1)).astype(np.float32)
         else:
             # Get pressure vertices
-            pbot = container.get('bottomLevelPressure',cat) 
-            ptop = container.get('topLevelPressure',cat) 
+            pbot = container.get('bottomLevelPressure', cat)
+            ptop = container.get('topLevelPressure', cat)
 
-            # Assign reference pressures 
+            # Assign reference pressures
             pref = pbot
             pressure = np.tile(pref, nprofs).astype(np.float32)
 
@@ -134,8 +135,8 @@ class BufrOzoneOmpsnpObsBuilder(ObsBuilder):
             pressureVertice = np.column_stack((ptop, pbot))
 
         self.log.debug(f'shape(pressureVertice) = {pressureVertice.shape}')
-        self.log.debug(f'pressureVertice min/max = {pressureVertice.min()} {pressureVertice.max()}')       
-    
+        self.log.debug(f'pressureVertice min/max = {pressureVertice.min()} {pressureVertice.max()}')
+
         # Add 2D pressure boundaries array to container
         pathLocation = container.get_paths('latitude', cat)
         pathPressure = [pathLocation[0], '*/VERTICE']
