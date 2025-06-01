@@ -8,12 +8,16 @@ from bufr.obs_builder import ObsBuilder, add_dummy_variable
 
 
 class BufrOzoneObsBuilder(ObsBuilder):
+    """
+    Observations builder for BUFR Ozone data.
+
+    Inherits from ObsBuilder and provides specific logic for ozone observation processing.
+    """
 
     def __init__(self, mapping_path, log_name=os.path.basename(__file__)):
         super().__init__(mapping_path, log_name=log_name)
 
     def make_obs(self, comm, input_path):
-
         # Get container from mapping file first
         self.log.info('Get container from bufr')
         container = super().make_obs(comm, input_path)
@@ -55,7 +59,14 @@ class BufrOzoneObsBuilder(ObsBuilder):
             }])
 
     def _add_pressures(self, container, cat):
+        """
+        Add pressure metadata to the container for a given category.
 
+        :param container: Observation container.
+        :type container: object
+        :param cat: Category identifier (tuple or similar).
+        :type cat: object
+        """
         # Add new MetaData variables: MetaData/pressure
         satId = container.get('satelliteId', cat)
         if not satId.size:

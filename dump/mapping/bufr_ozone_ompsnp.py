@@ -76,6 +76,17 @@ class BufrOzoneOmpsnpObsBuilder(BufrOzoneObsBuilder):
             }])
 
     def _add_ompsnp_pressures(self, container, cat):
+        """
+        Add pressure-related variables and data to the container.
+
+        This includes generating pressure vertices and replacing the pressure variable
+        as needed, depending on whether reference pressures are used.
+
+        :param container: Observation container to modify.
+        :type container: object
+        :param cat: Category key for container access.
+        :type cat: any
+        """
 
         # Add new MetaData pressure-related variables
         satId = container.get('satelliteId', cat)
