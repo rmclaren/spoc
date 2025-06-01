@@ -54,18 +54,18 @@ class BufrOzoneOmpsnpObsBuilder(BufrOzoneObsBuilder):
 
     def _make_description(self):
         description = super()._make_description()
-        self._add_new_variable_descriptions(description)
-        self._add_new_variable_dimensions(description)
+        self._add_new_pressure_descriptions(description)
+        self._add_new_pressure_dimensions(description)
 
         return description
 
-    def _add_new_variable_dimensions(self, description):
+    def _add_new_pressure_dimensions(self, description):
         description = super()._make_description()
         description.add_dimension("Vertice", ["*/VERTICE"])
 
         return description
 
-    def _add_new_variable_descriptions(self, description):
+    def _add_new_pressure_descriptions(self, description):
         description.add_variables([
             {
                 'name': 'RetrievalAncillaryData/pressureVertice',
