@@ -15,7 +15,7 @@ class BufrOzoneOmpstcObsBuilder(BufrOzoneObsBuilder):
     Class for building observations from ompst8 BUFR data.
 
     This class extends `ObsBuilder` to include specific logic for processing
-    Level-2 retrived total ozone data from OMPS nadir mapper 
+    Level-2 retrived total ozone data from OMPS nadir mapper
 
     :param mapping_path: Path to the mapping file.
     :type mapping_path: str

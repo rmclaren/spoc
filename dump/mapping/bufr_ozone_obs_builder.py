@@ -63,9 +63,8 @@ class BufrOzoneObsBuilder(ObsBuilder):
             add_dummy_variable(container, 'pressure', cat, 'latitude')
             return
 
-        latitude = container.get('latitude',cat) 
+        latitude = container.get('latitude', cat)
         paths = container.get_paths('latitude', cat)
 
         pressure = np.full_like(latitude, 0)
         container.add('pressure', pressure, paths, cat)
-
