@@ -4,18 +4,18 @@ import numpy as np
 import numpy.ma as ma
 
 import bufr
-from bufr.obs_builder import ObsBuilder, add_main_functions, add_dummy_variable, map_path
-
+from bufr.obs_builder import ObsBuilder, add_main_functions, map_path
+from bufr_ozone_obs_builder import BufrOzoneObsBuilder
 
 MAPPING_PATH = map_path('bufr_ozone_ompstc.yaml')
 
 
-class BufrOzoneOmpstcObsBuilder(ObsBuilder):
+class BufrOzoneOmpstcObsBuilder(BufrOzoneObsBuilder):
     """
     Class for building observations from ompst8 BUFR data.
 
     This class extends `ObsBuilder` to include specific logic for processing
-    Level-2 retrived total ozone data from OMPS nadir mapper
+    Level-2 retrived total ozone data from OMPS nadir mapper 
 
     :param mapping_path: Path to the mapping file.
     :type mapping_path: str
@@ -43,43 +43,11 @@ class BufrOzoneOmpstcObsBuilder(ObsBuilder):
             if not np.any(satId):
                 self.log.warning(f'category {cat[0]} does not exist in input file')
 
-            self._add_pressures(container, cat)
-
         # Check
         self.log.debug(f'container list (updated): {container.list()}')
         self.log.debug(f'all_sub_categories {container.all_sub_categories()}')
 
         return container
-
-    def _make_description(self):
-        description = super()._make_description()
-        self._add_new_variable_descriptions(description)
-
-        return description
-
-    def _add_new_variable_descriptions(self, description):
-        description.add_variables([
-            {
-                'name': 'MetaData/pressure',
-                'source': 'pressure',
-                'units': 'Pa',
-                'longName': 'Pressure',
-            }])
-
-    def _add_pressures(self, container, cat):
-
-        # Add new MetaData variables: MetaData/pressure
-        satId = container.get('satelliteId', cat)
-        if not satId.size:
-            self.log.warning(f'category {cat[0]} does not exist in input file')
-            add_dummy_variable(container, 'pressure', cat, 'latitude')
-            return
-
-        latitude = container.get('latitude', cat)
-        paths = container.get_paths('latitude', cat)
-
-        pressure = np.full_like(latitude, 0)
-        container.add('pressure', pressure, paths, cat)
 
 
 # Add main functions create_obs_file or create_obs_group
