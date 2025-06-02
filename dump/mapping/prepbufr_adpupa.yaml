@@ -103,25 +103,33 @@ bufr:
 
 encoder:
   globals:
-    - name: "dataOriginalFormatSpec"
-      type: string
-      value: "prepbufr"
-
-    - name: "platforms"
+    - name: "platformCommonName"
       type: string
       value: "ADPUPA"
 
-    - name: "source"
-      type: string
-      value: "prepBUFR"
-
     - name: "description"
       type: string
-      value: "UPPER-AIR (RAOB, PIBAL, RECCO, DROPS) REPORTS"
+      value: "Upper-air (RAOB, PIBAL, RECCO, DROPS) reports"
 
-    - name: "dataProviderOrigin"
+    - name: "platformLongDescription"
       type: string
-      value: "U.S. NOAA NCEP"
+      value: "Upper-air sounding data from radiosonde and pilot stations in prepBUFR format"
+
+    - name: "sensor"
+      type: string
+      value: "Upper-air soundings"
+
+    - name: "source"
+      type: string
+      value: "U.S. National Weather Service, National Centers for Environmental Prediction (NCEP))"
+
+    - name: "sourceFiles"
+      type: string
+      value: "NCEP prepBUFR - ADPUPA"
+
+    - name: "converter"
+      type: string
+      value: "bufr-query"
 
   variables:
     # Observation Type: pressure
