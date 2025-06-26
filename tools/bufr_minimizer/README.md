@@ -7,7 +7,7 @@ sample BUFR files for unit tests or debugging.
 ## Usage
 
 ```bash
-python bufr_minimizer.py INPUT_FILE OUTPUT_FILE [--max-subsets N]
+python tools/bufr_minimizer/bufr_minimizer.py INPUT_FILE OUTPUT_FILE [--max-subsets N]
 ```
 
 - `INPUT_FILE` – path to the original BUFR file.
@@ -17,3 +17,6 @@ python bufr_minimizer.py INPUT_FILE OUTPUT_FILE [--max-subsets N]
 
 The script relies on the `ncepbufr` Python interface provided by the
 `NCEPLIBS-bufr` project.
+
+Make sure this package is installed and available on your `PYTHONPATH` before
+running the script.

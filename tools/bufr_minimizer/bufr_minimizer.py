@@ -41,7 +41,14 @@ def minimize_bufr(in_path: str, out_path: str, max_subsets: int = 1000) -> None:
                     pass
                 continue
 
-            bufr_out.open_message(msg_type, bufr_in.msg_date, bufr_in.receipt_time)
+            if bufr_in.receipt_time and bufr_in.receipt_time > 0:
+                bufr_out.open_message(
+                    msg_type,
+                    bufr_in.msg_date,
+                    bufr_in.receipt_time,
+                )
+            else:
+                bufr_out.open_message(msg_type, bufr_in.msg_date)
 
             copied = 0
             while bufr_in.load_subset() == 0:
