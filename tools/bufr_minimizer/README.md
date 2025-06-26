@@ -15,4 +15,5 @@ python bufr_minimizer.py INPUT_FILE OUTPUT_FILE [--max-subsets N]
 - `--max-subsets` – optional maximum number of subsets to keep for each subset
   type.  Defaults to `1000` if not provided.
 
-The script requires the python interface of the `nceplibs-bufr` library.
+The script relies on the `ncepbufr` Python interface provided by the
+`NCEPLIBS-bufr` project.
