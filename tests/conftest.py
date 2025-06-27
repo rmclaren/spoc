@@ -9,7 +9,6 @@ DATA_URL = "https://ftp.emc.ncep.noaa.gov/static_files/public/spoc/spoc-0.0.0.tg
 
 @pytest.fixture(autouse=True)
 def change_test_dir(request, monkeypatch):
-    print ('**** ', os.path.join(request.fspath.dirname, 'data'))
     monkeypatch.chdir(os.path.join(request.fspath.dirname, 'data'))
 
 @pytest.fixture(scope="session", autouse=True)
