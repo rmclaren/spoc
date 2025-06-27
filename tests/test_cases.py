@@ -55,5 +55,4 @@ TEST_CASES = [
         'cmp': 'testoutput/bufr_satwnd_amv_seviri_m10.nc',
         'result': 'testrun/bufr_satwnd_amv_seviri_m10.nc'
     },
-
 ]
