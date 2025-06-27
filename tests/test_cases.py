@@ -1,5 +1,4 @@
-# Each entry defines a mapping module and required files
-# Add additional mappings as needed
+
 TEST_CASES = [
     {
         'map': 'bufr_atms',
