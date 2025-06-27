@@ -7,13 +7,16 @@ sample BUFR files for unit tests or debugging.
 ## Usage
 
 ```bash
-python tools/bufr_minimizer/bufr_minimizer.py INPUT_FILE OUTPUT_FILE [--max-subsets N]
+python tools/bufr_minimizer/bufr_minimizer.py INPUT_FILE OUTPUT_FILE [--max-subsets N] [--category-mnemonic MNEM]
 ```
 
 - `INPUT_FILE` – path to the original BUFR file.
 - `OUTPUT_FILE` – location where the minimized BUFR file will be written.
 - `--max-subsets` – optional maximum number of subsets to keep for each subset
-  type.  Defaults to `1000` if not provided.
+  type or category. Defaults to `1000` if not provided.
+- `--category-mnemonic` – optional mnemonic used to further categorize subsets.
+  When set, the subset limit applies to each unique combination of message type
+  and mnemonic value.
 
 The script relies on the `ncepbufr` Python interface provided by the
 `NCEPLIBS-bufr` project.

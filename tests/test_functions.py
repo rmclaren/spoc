@@ -40,15 +40,11 @@ def test_create_obs_file(cfg):
 def test_create_obs_group(cfg):
     pytest.importorskip('pyioda')
 
-    module = importlib.import_module(cfg['module'])
+    module = importlib.import_module(cfg['map'])
 
-    bufr_path = os.path.join(DATA_DIR, cfg['bufr_file'])
-    map_path = os.path.join(DATA_DIR, cfg['mapping_file'])
+    args = cfg['args']
+    args['env'] = {'comm_name': 'world'}
 
-    if not (os.path.exists(bufr_path) and os.path.exists(map_path)):
-        pytest.skip('Required test files are missing')
-
-    env = {'comm_name': 'world'}
-    obs = module.create_obs_group(bufr_path, map_path, cfg['cycle_time'], env)
+    obs = module.create_obs_group(**args)
 
     assert obs is not None
