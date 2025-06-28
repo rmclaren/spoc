@@ -4,6 +4,7 @@ import importlib
 import shutil
 import subprocess
 import pytest
+import inspect
 
 from .test_cases import TEST_CASES
 
@@ -25,7 +26,14 @@ def test_create_obs_file(cfg):
     cmp_path = os.path.join(DATA_DIR, cfg['cmp'])
     result_path = os.path.join(DATA_DIR, cfg['result'])
 
-    module.create_obs_file(**args)
+    signature = inspect.signature(module.create_obs_file)
+
+    func_args:dict = {}
+    for key in args.keys():
+        if key in signature.parameters.keys():
+            func_args[key] = args[key]
+
+    module.create_obs_file(**func_args)
 
     nccmp_bin = shutil.which('nccmp')
     if not nccmp_bin:
@@ -45,6 +53,13 @@ def test_create_obs_group(cfg):
     args = cfg['args']
     args['env'] = {'comm_name': 'world'}
 
-    obs = module.create_obs_group(**args)
+    signature = inspect.signature(module.create_obs_group)
+
+    func_args:dict = {}
+    for key in args.keys():
+        if key in signature.parameters.keys():
+            func_args[key] = args[key]
+
+    obs = module.create_obs_group(**func_args)
 
     assert obs is not None
